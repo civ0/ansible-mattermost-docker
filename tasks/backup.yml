@@ -1,0 +1,13 @@
+---
+
+- name: Register backup timestamp
+  command: date --iso=seconds
+  register: backup_timestamp
+  changed_when: False
+
+- name: Backup volumes
+  command: "rsync -a {{ mattermost_docker_install_path }}/volumes/ {{ mattermost_docker_install_path }}/backups/{{ backup_timestamp.stdout }}"
+
+- name: Backup database
+  shell: "docker exec -t mattermostdocker_db_1 pg_dump -U {{ mattermost_docker_postgres_user }} {{ mattermost_docker_postgres_database }} > {{ mattermost_docker_install_path }}/backups/{{ backup_timestamp.stdout }}/db.sql"
+

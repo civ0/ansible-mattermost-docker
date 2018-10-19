@@ -1,0 +1,17 @@
+---
+
+mattermost_docker_version: 5.4.0
+mattermost_docker_upgrade: no
+mattermost_docker_install_path: /opt/mattermost
+mattermost_docker_team_edition: yes
+mattermost_docker_update_volume_permissions: yes # this is needed for mattermost-docker > 4.9
+mattermost_docker_uid: 2000
+mattermost_docker_gid: 2000
+mattermost_docker_http_port: 8000
+mattermost_docker_https_port: 8443
+
+# override these with vars from a vault
+mattermost_docker_postgres_user: mattermost
+mattermost_docker_postgres_password: secure
+mattermost_docker_postgres_database: mattermost
+

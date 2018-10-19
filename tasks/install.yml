@@ -1,0 +1,60 @@
+---
+
+- name: Install packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - git
+
+- name: Clone mattermost-docker
+  git:
+    repo: https://github.com/mattermost/mattermost-docker
+    dest: "{{ mattermost_docker_install_path }}/mattermost-docker"
+    version: "{{ mattermost_docker_version }}"
+    force: "{{ mattermost_docker_upgrade }}"
+    update: "{{ mattermost_docker_upgrade }}"
+
+- name: Create volume backup directory
+  file:
+    state: directory
+    path: "{{ mattermost_docker_install_path }}/backups"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Template docker-compose.yml
+  template:
+    src: "{{ mattermost_docker_version }}/docker-compose.yml.j2"
+    dest: "{{ mattermost_docker_install_path }}/mattermost-docker/docker-compose.yml"
+    owner: root
+    group: root
+    mode: 0600
+  no_log: yes
+
+- name: Build images
+  docker_service:
+    project_src: "{{ mattermost_docker_install_path }}/mattermost-docker"
+    state: present
+    stopped: yes
+    build: "{{ mattermost_docker_upgrade }}"
+
+- name: Update volume directory permissions
+  file:
+    path: "{{ mattermost_docker_install_path }}/volumes"
+    state: directory
+    owner: 2000
+    group: 2000
+    recurse: yes
+  when: mattermost_docker_update_volume_permissions
+
+- name: Start containers
+  docker_service:
+    project_src: "{{ mattermost_docker_install_path }}/mattermost-docker"
+    state: present
+
+- name: User information
+  debug:
+    msg: You can now login to your Mattermost instance and do the initial setup. Run the restart-mattermost.yml playbook when you are done.
+  when: not mattermost_docker_upgrade
+
