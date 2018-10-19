@@ -5,9 +5,27 @@
   register: backup_timestamp
   changed_when: False
 
-- name: Backup volumes
-  command: "rsync -a {{ mattermost_docker_install_path }}/volumes/ {{ mattermost_docker_install_path }}/backups/{{ backup_timestamp.stdout }}"
+- name: Create backup directory
+  file:
+    path: "{{ mattermost_docker_install_path }}/backups/{{ backup_timestamp.stdout }}"
+    state: directory
+    recurse: yes
 
 - name: Backup database
   shell: "docker exec -t mattermostdocker_db_1 pg_dump -U {{ mattermost_docker_postgres_user }} {{ mattermost_docker_postgres_database }} > {{ mattermost_docker_install_path }}/backups/{{ backup_timestamp.stdout }}/db.sql"
+
+- name: Stop containers for volume backup
+  docker_service:
+    project_src: "{{ mattermost_docker_install_path }}/mattermost-docker"
+    state: present
+    stopped: yes
+
+- name: Backup volumes
+  command: "rsync -a {{ mattermost_docker_install_path }}/volumes/ {{ mattermost_docker_install_path }}/backups/{{ backup_timestamp.stdout }}"
+
+- name: Start containers after volume backup
+  docker_service:
+    project_src: "{{ mattermost_docker_install_path }}/mattermost-docker"
+    state: present
+    stopped: no
 

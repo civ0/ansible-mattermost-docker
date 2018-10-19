@@ -1,6 +1,19 @@
 # ansible-mattermost-docker
 Deploy [mattermost/mattermost-docker](https://github.com/mattermost/mattermost-docker) with Ansible on an existing server
 
+# Table of contents
+<!-- vim-markdown-toc GFM -->
+
+* [Use case for this role](#use-case-for-this-role)
+* [Supported systems](#supported-systems)
+	* [Requirements](#requirements)
+* [Example playbooks](#example-playbooks)
+	* [Installing Mattermost](#installing-mattermost)
+	* [Upgrading Mattermost to a newer version](#upgrading-mattermost-to-a-newer-version)
+* [Variables](#variables)
+
+<!-- vim-markdown-toc -->
+
 ## Use case for this role
 Use this role if you want to deploy Mattermost in docker on an existing server. The web container with the nginx reverse proxy is not used, you have to configure your own reverse proxy.
 
