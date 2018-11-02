@@ -32,6 +32,25 @@
     mode: 0600
   no_log: yes
 
+- name: Template systemd unit
+  template:
+    src: mattermost-docker.service.j2
+    dest: /etc/systemd/system/mattermost-docker.service
+    owner: root
+    group: root
+    mode: 0644
+  register: unit
+
+- name: Reload daemons
+  systemd:
+    daemon_reload: yes
+  when: unit.changed
+
+- name: Enable service
+  systemd:
+    name: mattermost-docker.service
+    enabled: yes
+
 - name: Build images
   docker_service:
     project_src: "{{ mattermost_docker_install_path }}/mattermost-docker"
@@ -49,9 +68,9 @@
   when: mattermost_docker_update_volume_permissions
 
 - name: Start containers
-  docker_service:
-    project_src: "{{ mattermost_docker_install_path }}/mattermost-docker"
-    state: present
+  systemd:
+    name: mattermost-docker.service
+    state: started
 
 - name: User information
   debug:

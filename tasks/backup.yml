@@ -15,17 +15,15 @@
   shell: "docker exec -t mattermostdocker_db_1 pg_dump -U {{ mattermost_docker_postgres_user }} {{ mattermost_docker_postgres_database }} > {{ mattermost_docker_install_path }}/backups/{{ backup_timestamp.stdout }}/db.sql"
 
 - name: Stop containers for volume backup
-  docker_service:
-    project_src: "{{ mattermost_docker_install_path }}/mattermost-docker"
-    state: present
-    stopped: yes
+  systemd:
+    name: mattermost-docker.service
+    state: stopped
 
 - name: Backup volumes
   command: "rsync -a {{ mattermost_docker_install_path }}/volumes/ {{ mattermost_docker_install_path }}/backups/{{ backup_timestamp.stdout }}"
 
 - name: Start containers after volume backup
-  docker_service:
-    project_src: "{{ mattermost_docker_install_path }}/mattermost-docker"
-    state: present
-    stopped: no
+  systemd:
+    name: mattermost-docker.service
+    state: started
 
