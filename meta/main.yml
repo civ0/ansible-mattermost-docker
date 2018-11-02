@@ -1,7 +1,6 @@
 galaxy_info:
   author: Janis Marrek
   description: Ansible role for installing mattermost-docker
-  company:
 
 license: Apache-2.0
 
