@@ -1,0 +1,48 @@
+version: "2"
+
+services:
+
+  db:
+    build: db
+    read_only: true
+    restart: unless-stopped
+    volumes:
+      - {{ mattermost_docker_install_path }}/volumes/db/var/lib/postgresql/data:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - POSTGRES_USER={{ mattermost_docker_postgres_user }}
+      - POSTGRES_PASSWORD={{ mattermost_docker_postgres_password }}
+      - POSTGRES_DB={{ mattermost_docker_postgres_database }}
+    # uncomment the following to enable backup
+    #  - AWS_ACCESS_KEY_ID=XXXX
+    #  - AWS_SECRET_ACCESS_KEY=XXXX
+    #  - WALE_S3_PREFIX=s3://BUCKET_NAME/PATH
+    #  - AWS_REGION=us-east-1
+
+  app:
+    build:
+      context: app
+      # uncomment following lines for team edition or change UID/GID
+      args:
+{% if mattermost_docker_team_edition %}
+        - edition=team
+{% endif %}
+        - PUID={{ mattermost_docker_uid }}
+        - PGID={{ mattermost_docker_gid }}
+    restart: unless-stopped
+    ports:
+      - "{{ mattermost_docker_http_port }}:8000"
+    volumes:
+      - {{ mattermost_docker_install_path }}/volumes/app/mattermost/config:/mattermost/config:rw
+      - {{ mattermost_docker_install_path }}/volumes/app/mattermost/data:/mattermost/data:rw
+      - {{ mattermost_docker_install_path }}/volumes/app/mattermost/logs:/mattermost/logs:rw
+      - {{ mattermost_docker_install_path }}/volumes/app/mattermost/plugins:/mattermost/plugins:rw
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      # set same as db credentials and dbname
+      - MM_USERNAME={{ mattermost_docker_postgres_user }}
+      - MM_PASSWORD={{ mattermost_docker_postgres_password }}
+      - MM_DBNAME={{ mattermost_docker_postgres_database }}
+      # in case your config is not in default location
+      #- MM_CONFIG=/mattermost/config/config.json
+
