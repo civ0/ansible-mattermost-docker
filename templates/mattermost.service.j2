@@ -1,0 +1,20 @@
+[Unit]
+Description=Docker Compose container starter for mattermost-docker
+After=docker.service network-online.target
+Requires=docker.service network-online.target
+
+[Service]
+WorkingDirectory={{ mattermost_docker_src_path }}
+Type=oneshot
+RemainAfterExit=yes
+
+ExecStartPre=docker-compose {{ mm_docker_compose_args }} pull --quiet
+ExecStart=docker-compose {{ mm_docker_compose_args }} up -d 
+
+ExecStop=docker-compose {{ mm_docker_compose_args }} down
+
+ExecReload=docker-compose {{ mm_docker_compose_args }} pull --quiet
+ExecReload=docker-compose {{ mm_docker_compose_args }} up -d
+
+[Install]
+WantedBy=multi-user.target

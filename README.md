@@ -1,8 +1,13 @@
-# ansible-mattermost-docker
-Deploy [mattermost/mattermost-docker](https://github.com/mattermost/mattermost-docker) with Ansible on an existing server
+# ansible-role-mattermost-docker
+
+Deploy [mattermost/docker](https://github.com/mattermost/docker) (team edition) with Ansible on an existing server.
+
+- **Based on:** https://github.com/civ0/ansible-mattermost-docker
+- **Mattermost version supported**: >= 7.2
+
+Setup instructions are adapted from https://docs.mattermost.com/install/install-docker.html
 
 # Table of contents
-<!-- vim-markdown-toc GFM -->
 
 * [Use case for this role](#use-case-for-this-role)
 * [Supported systems](#supported-systems)
@@ -12,13 +17,12 @@ Deploy [mattermost/mattermost-docker](https://github.com/mattermost/mattermost-d
 	* [Upgrading Mattermost to a newer version](#upgrading-mattermost-to-a-newer-version)
 * [Variables](#variables)
 
-<!-- vim-markdown-toc -->
-
 ## Use case for this role
-Use this role if you want to deploy Mattermost in docker on an existing server. The web container with the nginx reverse proxy is not used, you have to configure your own reverse proxy.
+Use this role if you want to deploy Mattermost in docker on an existing server. It automatically configures a reverse proxy and HTTPS certificates.
 
 ## Supported systems
-Currently only Ubuntu is suppoerted.
+Currently only Debian systems are supported.
+
 ### Requirements
 The following packages are must be installed
 * `docker.io`
@@ -40,14 +44,11 @@ The following packages are must be installed
           - docker-compose
           - git
   roles:
-    - role: ansible-mattermost-docker
+    - role: mattermost
       vars:
         mattermost_docker_install: yes
-        mattermost_docker_version: 5.4.0
-        mattermost_docker_update_volume_permissions: yes # set this to yes for Mattermost version greater than 4.9.x
-      tags:
-        - mattermost
 ```
+
 After the installation has finished, go to your freshly installed Mattermost in a browser and create the first user and team and also set the Site-URL. Changing the Site-URL requires a restart. An example playbook for restarting Mattermost is provided below.
 ```
 ---
@@ -55,12 +56,13 @@ After the installation has finished, go to your freshly installed Mattermost in 
   hosts: mattermost
   become: yes
   roles:
-    - role: ansible-mattermost-docker
+    - role: mattermost
       vars:
         mattermost_docker_restart: yes
 ```
+
 ### Upgrading Mattermost to a newer version
-Uprades are done rebuilding the images from a new version of [mattermost/mattermost-docker](https://github.com/mattermost/mattermost-docker). The example playbook below creates a backup at `{{ mattermost_docker_postgres_database }}/backups` of you volumes and upgrades the Mattermost installation to `mattermost_docker_version`. The backups are not deleted automatically.
+Uprades are done rebuilding the images from a new version of [mattermost/docker](https://github.com/mattermost/docker). The example playbook below creates a backup at `{{ mattermost_docker_postgres_database }}/backups` of you volumes and upgrades the Mattermost installation to `mattermost_docker_version`. The backups are not deleted automatically.
 ```
 ---
 - name: Upgrade Mattermost
@@ -80,19 +82,17 @@ Uprades are done rebuilding the images from a new version of [mattermost/matterm
 ## Variables
 The following variables are used by the role:
 ```
-mattermost_docker_version: 5.4.0
 mattermost_docker_upgrade: no
 mattermost_docker_install_path: /opt/mattermost
-mattermost_docker_team_edition: yes
-mattermost_docker_update_volume_permissions: yes # this is needed for mattermost-docker > 4.9
 mattermost_docker_uid: 2000
 mattermost_docker_gid: 2000
-mattermost_docker_http_port: 8000
-mattermost_docker_https_port: 8443
+mattermost_timezone: "UTC"
 
 # override these with vars from a vault
-mattermost_docker_postgres_user: mattermost
-mattermost_docker_postgres_password: secure
-mattermost_docker_postgres_database: mattermost
+mm_postgres_user: mattermost
+mm_postgres_pass: secure
+
+# set an email for being contacted about
+lets_encrypt_email: admin@example.com
 ```
 

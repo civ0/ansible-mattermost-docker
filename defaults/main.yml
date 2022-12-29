@@ -1,17 +1,39 @@
 ---
 
-mattermost_docker_version: 5.4.0
-mattermost_docker_upgrade: no
+mattermost_domain: "example.com"
+
+## Timezone inside the containers. The value needs to be in the form 'Europe/Berlin'.
+## A list of these tz database names can be looked up at Wikipedia
+## https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+mattermost_timezone: "UTC"
+
 mattermost_docker_install_path: /opt/mattermost
-mattermost_docker_team_edition: yes
-mattermost_docker_update_volume_permissions: yes # this is needed for mattermost-docker > 4.9
+mattermost_docker_src_path: "{{ mattermost_docker_install_path }}/docker"
+mattermost_docker_backup_path: "{{ mattermost_docker_install_path }}/backups"
+mattermost_docker_volumes_path: "{{ mattermost_docker_install_path }}/volumes"
+
+# setup with included NGINX
+mm_docker_compose_args: "-f docker-compose.yml -f docker-compose.nginx.yml"
+
+mattermost_config_path: "{{ mattermost_docker_volumes_path }}/config"
+mattermost_db_path: "{{ mattermost_docker_volumes_path }}/db"
+mattermost_data_path: "{{ mattermost_docker_volumes_path }}/data"
+mattermost_logs_path: "{{ mattermost_docker_volumes_path }}/logs"
+mattermost_plugins_path: "{{ mattermost_docker_volumes_path }}/plugins"
+mattermost_client_path: "{{ mattermost_docker_volumes_path }}/client/plugins"
+mattermost_bleve_indexes_path: "{{ mattermost_docker_volumes_path }}/bleve-indexes"
+mattermost_nginx_config_path: "{{ mattermost_docker_src_path }}/nginx"
+
+mattermost_certs_path: "{{ mattermost_docker_volumes_path }}/certs"
+mattermost_cert: "{{mattermost_certs_path}}/etc/letsencrypt/live/{{mattermost_domain}}/fullchain.pem"
+mattermost_cert_key: "{{mattermost_certs_path}}/etc/letsencrypt/live/{{mattermost_domain}}/privkey.pem"
+
+lets_encrypt_email: admin@example.com
+
+mm_postgres_user: mmuser
+mm_postgres_pass: mmuser_password
+
 mattermost_docker_uid: 2000
 mattermost_docker_gid: 2000
-mattermost_docker_http_port: 8000
-mattermost_docker_https_port: 8443
 
-# override these with vars from a vault
-mattermost_docker_postgres_user: mattermost
-mattermost_docker_postgres_password: secure
-mattermost_docker_postgres_database: mattermost
-
+mattermost_docker_upgrade: no

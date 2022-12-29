@@ -2,40 +2,68 @@
 
 - name: Install packages
   apt:
-    name: "{{ item }}"
+    name: git
     state: present
-  loop:
-    - git
 
 - name: Clone mattermost-docker
   git:
-    repo: https://github.com/mattermost/mattermost-docker
-    dest: "{{ mattermost_docker_install_path }}/mattermost-docker"
-    version: "{{ mattermost_docker_version }}"
+    repo: https://github.com/mattermost/docker
+    dest: "{{ mattermost_docker_src_path }}"
+    version: "HEAD"
     force: "{{ mattermost_docker_upgrade }}"
     update: "{{ mattermost_docker_upgrade }}"
 
-- name: Create volume backup directory
-  file:
-    state: directory
-    path: "{{ mattermost_docker_install_path }}/backups"
-    owner: root
-    group: root
-    mode: 0600
-
-- name: Template docker-compose.yml
+- name: Copy custom configuration
   template:
-    src: "{{ mattermost_docker_version }}/docker-compose.yml.j2"
-    dest: "{{ mattermost_docker_install_path }}/mattermost-docker/docker-compose.yml"
+    src: env.j2
+    dest: "{{ mattermost_docker_src_path }}/.env"
     owner: root
     group: root
-    mode: 0600
-  no_log: yes
+    mode: 0640
+
+- name: Check that HTTPs certificates exist
+  stat:
+    path: "{{mattermost_cert}}"
+  register: cert_exists
+
+- name: Create certs directory
+  file:
+    path: "{{ mattermost_certs_path }}"
+    state: directory
+  when: not cert_exists.stat.exists
+
+- name: Generate certificates for the first time
+  ansible.builtin.command:
+    cmd: "docker run -it --rm --name certbot -p 80:80 -v \"{{mattermost_certs_path}}/etc/letsencrypt:/etc/letsencrypt\" -v \"{{mattermost_certs_path}}/lib/letsencrypt:/var/lib/letsencrypt\" certbot/certbot certonly --standalone -d {{mattermost_domain}} --email {{lets_encrypt_email}} --non-interactive --agree-tos"
+  when: not cert_exists.stat.exists
+  register: certbot_result
+
+- name: Print certificate generation output
+  debug:
+    var: certbot_result.stdout_lines
+  when: not cert_exists.stat.exists
+
+- name: Update volume directory permissions
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ mattermost_docker_uid }}"
+    group: "{{ mattermost_docker_gid }}"
+    recurse: yes
+  with_items:
+    - "{{ mattermost_config_path }}"
+    - "{{ mattermost_db_path }}"
+    - "{{ mattermost_data_path }}"
+    - "{{ mattermost_logs_path }}"
+    - "{{ mattermost_plugins_path }}"
+    - "{{ mattermost_client_path  }}"
+    - "{{ mattermost_bleve_indexes_path }}"
+    - "{{ mattermost_nginx_config_path }}"
 
 - name: Template systemd unit
   template:
-    src: mattermost-docker.service.j2
-    dest: /etc/systemd/system/mattermost-docker.service
+    src: mattermost.service.j2
+    dest: /etc/systemd/system/mattermost.service
     owner: root
     group: root
     mode: 0644
@@ -48,32 +76,23 @@
 
 - name: Enable service
   systemd:
-    name: mattermost-docker.service
+    name: mattermost.service
     enabled: yes
 
 - name: Build images
-  docker_service:
-    project_src: "{{ mattermost_docker_install_path }}/mattermost-docker"
+  docker_compose:
+    project_src: "{{ mattermost_docker_src_path }}"
+    files: ["docker-compose.yml", "docker-compose.nginx.yml"]
     state: present
     stopped: yes
     build: "{{ mattermost_docker_upgrade }}"
 
-- name: Update volume directory permissions
-  file:
-    path: "{{ mattermost_docker_install_path }}/volumes"
-    state: directory
-    owner: 2000
-    group: 2000
-    recurse: yes
-  when: mattermost_docker_update_volume_permissions
-
 - name: Start containers
   systemd:
-    name: mattermost-docker.service
-    state: started
+    name: mattermost.service
+    state: restarted
 
 - name: User information
   debug:
     msg: You can now login to your Mattermost instance and do the initial setup. Run the restart-mattermost.yml playbook when you are done.
   when: not mattermost_docker_upgrade
-

@@ -1,7 +1,0 @@
----
-
-- name: Restart containers
-  systemd:
-    name: mattermost-docker.service
-    state: restarted
-
