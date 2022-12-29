@@ -1,0 +1,18 @@
+galaxy_info:
+  role_name: mattermost-docker
+  author: Francisc Core
+  description: Deploy [mattermost/docker](https://github.com/mattermost/docker) (team edition) with Ansible on an existing server.
+  issue_tracker_url: https://github.com/PrivacyLx/ansible-role-mattermost-docker
+  license: Apache
+
+  min_ansible_version: 2.11.1
+
+  platforms:
+    - name: Debian
+      versions:
+      - bookworm
+      - bullseye
+
+  galaxy_tags: []
+
+dependencies: []
