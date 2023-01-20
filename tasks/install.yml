@@ -52,7 +52,6 @@
     recurse: yes
   with_items:
     - "{{ mattermost_config_path }}"
-    - "{{ mattermost_db_path }}"
     - "{{ mattermost_data_path }}"
     - "{{ mattermost_logs_path }}"
     - "{{ mattermost_plugins_path }}"
