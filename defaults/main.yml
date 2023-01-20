@@ -32,8 +32,11 @@ lets_encrypt_email: admin@example.com
 
 mm_postgres_user: mmuser
 mm_postgres_pass: mmuser_password
+mm_postgres_db: mattermost
 
 mattermost_docker_uid: 2000
 mattermost_docker_gid: 2000
 
 mattermost_docker_upgrade: no
+mattermost_docker_install: no
+mattermost_emergency_restore: no

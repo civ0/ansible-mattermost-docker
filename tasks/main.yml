@@ -1,7 +1,7 @@
 ---
 
-#- include_tasks: backup.yml
-#  when: mattermost_docker_upgrade
+- include_tasks: backup-create.yml
+  when: mattermost_docker_upgrade
 
 - name: Remove images and containers before rebuilding for upgrade
   docker_compose:
@@ -10,8 +10,4 @@
   when: mattermost_docker_upgrade
 
 - include_tasks: install.yml
-  when: mattermost_docker_install is defined and mattermost_docker_install
-
-- include_tasks: restart.yml
-  when: mattermost_docker_restart is defined and mattermost_docker_restart
-
+  when: mattermost_docker_upgrade or mattermost_docker_install
