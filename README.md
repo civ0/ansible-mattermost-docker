@@ -67,12 +67,12 @@ Uprades are done rebuilding the images from a new version of [mattermost/docker]
 ---
 - name: Upgrade Mattermost
   hosts: mattermost
-  become: yes
+  become: true
   roles:
     - role: ansible-mattermost-docker
       vars:
-        mattermost_docker_install: yes
-        mattermost_docker_upgrade: yes
+        mattermost_docker_install: true
+        mattermost_docker_upgrade: true
         mattermost_docker_version: 5.4.0
 ```
 
@@ -81,8 +81,8 @@ The following variables are used by the role:
 ```
 mattermost_docker_install_path: /opt/mattermost
 mattermost_timezone: "UTC"
-mattermost_docker_upgrade: no
-mattermost_docker_install: no
+mattermost_docker_upgrade: false
+mattermost_docker_install: false
 
 # override these with vars from a vault
 mm_postgres_user: mattermost

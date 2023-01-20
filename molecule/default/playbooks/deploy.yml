@@ -1,0 +1,11 @@
+---
+
+- name: "Deploy a Mattermost server"
+  hosts: "mattermost"
+  become: true
+
+  roles:
+    - role: geerlingguy.docker
+    - role: mattermost
+      vars:
+        mattermost_docker_install: true

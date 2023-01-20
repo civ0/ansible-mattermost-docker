@@ -33,15 +33,21 @@
   when: not cert_exists.stat.exists
 
 - name: Generate certificates for the first time
-  ansible.builtin.command:
-    cmd: "docker run -it --rm --name certbot -p 80:80 -v \"{{mattermost_certs_path}}/etc/letsencrypt:/etc/letsencrypt\" -v \"{{mattermost_certs_path}}/lib/letsencrypt:/var/lib/letsencrypt\" certbot/certbot certonly --standalone -d {{mattermost_domain}} --email {{lets_encrypt_email}} --non-interactive --agree-tos"
+  shell: >
+    docker run -it --rm --name certbot -p 80:80
+    -v {{mattermost_certs_path}}/etc/letsencrypt:/etc/letsencrypt
+    -v {{mattermost_certs_path}}/lib/letsencrypt:/var/lib/letsencrypt
+    certbot/certbot certonly --standalone -d {{mattermost_domain}}
+    --non-interactive --agree-tos --email {{lets_encrypt_email}}
   when: not cert_exists.stat.exists
   register: certbot_result
+  tags: notest
 
 - name: Print certificate generation output
   debug:
     var: certbot_result.stdout_lines
   when: not cert_exists.stat.exists
+  tags: notest
 
 - name: Update volume directory permissions
   file:

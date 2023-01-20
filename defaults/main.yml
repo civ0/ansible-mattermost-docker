@@ -31,6 +31,7 @@ mattermost_cert: "{{mattermost_certs_path}}/etc/letsencrypt/live/{{mattermost_do
 mattermost_cert_key: "{{mattermost_certs_path}}/etc/letsencrypt/live/{{mattermost_domain}}/privkey.pem"
 
 lets_encrypt_email: admin@example.com
+lets_encrypt_test_cert: true
 
 mm_postgres_user: mmuser
 mm_postgres_pass: mmuser_password

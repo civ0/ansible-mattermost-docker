@@ -1,0 +1,60 @@
+---
+
+name: test
+on: [pull_request]
+
+defaults:
+  run:
+    working-directory: 'mattermost'
+
+jobs:
+  ansible-molecule:
+    runs-on: macos-10.15
+
+    # https://github.com/jonashackt/molecule-ansible-docker-aws#use-vagrant-on-github-actions-to-execute-molecule
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: 'mattermost'
+
+      - name: Cache pipenv virtualenvs incl. all pip packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pipenv-
+
+      - uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Cache Vagrant boxes
+        uses: actions/cache@v2
+        with:
+          path: ~/.vagrant.d/boxes
+          key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
+          restore-keys: |
+            ${{ runner.os }}-vagrant-
+
+      - name: Show Vagrant version
+        run: vagrant --version
+
+      - name: Install required dependecies with pipenv
+        run: |
+          pip --version
+          pip install pipenv
+          pipenv install --system --skip-lock
+          # XXX Hack: https://github.com/pypa/pipenv/issues/4888
+          #pipenv check
+
+      - name: Testing ansible playbook `deploy-mattermost`
+        run: |
+          pipenv run molecule lint
+          pipenv run molecule dependency
+          pipenv run molecule syntax
+          pipenv run molecule converge
+          pipenv run molecule idempotence
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
