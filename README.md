@@ -74,19 +74,15 @@ Uprades are done rebuilding the images from a new version of [mattermost/docker]
         mattermost_docker_install: yes
         mattermost_docker_upgrade: yes
         mattermost_docker_version: 5.4.0
-        mattermost_docker_update_volume_permissions: yes # set this to yes for Mattermost version greater than 4.9.x
-      tags:
-        - mattermost
 ```
 
 ## Variables
 The following variables are used by the role:
 ```
-mattermost_docker_upgrade: no
 mattermost_docker_install_path: /opt/mattermost
-mattermost_docker_uid: 2000
-mattermost_docker_gid: 2000
 mattermost_timezone: "UTC"
+mattermost_docker_upgrade: no
+mattermost_docker_install: no
 
 # override these with vars from a vault
 mm_postgres_user: mattermost
