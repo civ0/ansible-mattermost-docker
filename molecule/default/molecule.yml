@@ -1,0 +1,39 @@
+---
+
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+
+lint: |
+  set -e
+  yamllint .
+
+platforms:
+  - name: debian11-instance
+    box: generic/debian11
+    memory: 2000
+    cpus: 2
+    groups:
+      - mattermost
+
+provisioner:
+  name: ansible
+  options:
+    verbose: true
+  lint:
+    name: ansible-lint
+  #inventory:
+  #  links:
+  #    group_vars: ../../../../inventory/molecule/group_vars/
+  playbooks:
+    prepare: prepare.yml
+    converge: ../../../../deploy-discourse.yml
+
+verifier:
+  name: testinfra
+  directory: tests
+  options:
+    verbose: true
+  lint:
+    name: flake8

@@ -1,0 +1,13 @@
+---
+
+- import_playbook: ansible-version.yml
+
+- name: "Deploy a Mattermost server"
+  hosts: "mattermost"
+  become: true
+
+  roles:
+    - geerlingguy.docker
+    - role: mattermost
+      vars:
+        mattermost_docker_install: yes
