@@ -8,7 +8,7 @@
 - name: Clone mattermost-docker
   git:
     repo: https://github.com/mattermost/docker
-    dest: "{{ mattermost_docker_src_path }}"
+    dest: "{{ mm_docker_src_path }}"
     version: "{{ mm_docker_version }}"
     force: "{{ mattermost_docker_upgrade }}"
     update: "{{ mattermost_docker_upgrade }}"
@@ -16,28 +16,28 @@
 - name: Copy custom configuration
   template:
     src: env.j2
-    dest: "{{ mattermost_docker_src_path }}/.env"
+    dest: "{{ mm_docker_src_path }}/.env"
     owner: root
     group: root
     mode: 0640
 
 - name: Check that HTTPs certificates exist
   stat:
-    path: "{{mattermost_cert}}"
+    path: "{{mm_cert}}"
   register: cert_exists
 
 - name: Create certs directory
   file:
-    path: "{{ mattermost_certs_path }}"
+    path: "{{ mm_certs_path }}"
     state: directory
   when: not cert_exists.stat.exists
 
 - name: Generate certificates for the first time
   shell: >
     docker run -it --rm --name certbot -p 80:80
-    -v {{mattermost_certs_path}}/etc/letsencrypt:/etc/letsencrypt
-    -v {{mattermost_certs_path}}/lib/letsencrypt:/var/lib/letsencrypt
-    certbot/certbot certonly --standalone -d {{mattermost_domain}}
+    -v {{mm_certs_path}}/etc/letsencrypt:/etc/letsencrypt
+    -v {{mm_certs_path}}/lib/letsencrypt:/var/lib/letsencrypt
+    certbot/certbot certonly --standalone -d {{mm_domain}}
     --non-interactive --agree-tos --email {{lets_encrypt_email}}
   when: not cert_exists.stat.exists
   register: certbot_result
@@ -53,17 +53,17 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ mattermost_docker_uid }}"
-    group: "{{ mattermost_docker_gid }}"
+    owner: "{{ mm_docker_uid }}"
+    group: "{{ mm_docker_gid }}"
     recurse: true
   with_items:
-    - "{{ mattermost_config_path }}"
-    - "{{ mattermost_data_path }}"
-    - "{{ mattermost_logs_path }}"
-    - "{{ mattermost_plugins_path }}"
-    - "{{ mattermost_client_path  }}"
-    - "{{ mattermost_bleve_indexes_path }}"
-    - "{{ mattermost_nginx_config_path }}"
+    - "{{ mm_config_path }}"
+    - "{{ mm_data_path }}"
+    - "{{ mm_logs_path }}"
+    - "{{ mm_plugins_path }}"
+    - "{{ mm_client_path  }}"
+    - "{{ mm_bleve_indexes_path }}"
+    - "{{ mm_nginx_config_path }}"
 
 - name: Template systemd unit
   template:
@@ -86,7 +86,7 @@
 
 - name: Build images
   docker_compose:
-    project_src: "{{ mattermost_docker_src_path }}"
+    project_src: "{{ mm_docker_src_path }}"
     files: ["docker-compose.yml", "docker-compose.nginx.yml"]
     state: present
     stopped: true

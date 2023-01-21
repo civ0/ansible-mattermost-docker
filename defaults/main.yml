@@ -1,34 +1,35 @@
 ---
 
-mattermost_domain: "example.com"
+mm_domain: "example.com"
 
-## Timezone inside the containers. The value needs to be in the form 'Europe/Berlin'.
-## A list of these tz database names can be looked up at Wikipedia
+## Timezone inside the containers. The value needs to be in the
+## form 'Europe/Berlin'. A list of these tz database names can
+## be looked up at Wikipedia:
 ## https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-mattermost_timezone: "UTC"
+mm_timezone: "UTC"
 mm_version: v7.7
 mm_docker_version: "7dbb4b3"
 
-mattermost_docker_install_path: /opt/mattermost
-mattermost_docker_src_path: "{{ mattermost_docker_install_path }}/docker"
-mattermost_docker_backup_path: "{{ mattermost_docker_install_path }}/backups"
-mattermost_docker_volumes_path: "{{ mattermost_docker_install_path }}/volumes"
+mm_docker_install_path: /opt/mattermost
+mm_docker_src_path: "{{ mm_docker_install_path }}/docker"
+mm_docker_backup_path: "{{ mm_docker_install_path }}/backups"
+mm_docker_volumes_path: "{{ mm_docker_install_path }}/volumes"
 
 # setup with included NGINX
 mm_docker_compose_args: "-f docker-compose.yml -f docker-compose.nginx.yml"
 
-mattermost_config_path: "{{ mattermost_docker_volumes_path }}/config"
-mattermost_db_path: "{{ mattermost_docker_volumes_path }}/db"
-mattermost_data_path: "{{ mattermost_docker_volumes_path }}/data"
-mattermost_logs_path: "{{ mattermost_docker_volumes_path }}/logs"
-mattermost_plugins_path: "{{ mattermost_docker_volumes_path }}/plugins"
-mattermost_client_path: "{{ mattermost_docker_volumes_path }}/client/plugins"
-mattermost_bleve_indexes_path: "{{ mattermost_docker_volumes_path }}/bleve-indexes"
-mattermost_nginx_config_path: "{{ mattermost_docker_src_path }}/nginx"
+mm_config_path: "{{ mm_docker_volumes_path }}/config"
+mm_db_path: "{{ mm_docker_volumes_path }}/db"
+mm_data_path: "{{ mm_docker_volumes_path }}/data"
+mm_logs_path: "{{ mm_docker_volumes_path }}/logs"
+mm_plugins_path: "{{ mm_docker_volumes_path }}/plugins"
+mm_client_path: "{{ mm_docker_volumes_path }}/client/plugins"
+mm_bleve_indexes_path: "{{ mm_docker_volumes_path }}/bleve-indexes"
+mm_nginx_config_path: "{{ mm_docker_src_path }}/nginx"
 
-mattermost_certs_path: "{{ mattermost_docker_volumes_path }}/certs"
-mattermost_cert: "{{mattermost_certs_path}}/etc/letsencrypt/live/{{mattermost_domain}}/fullchain.pem"
-mattermost_cert_key: "{{mattermost_certs_path}}/etc/letsencrypt/live/{{mattermost_domain}}/privkey.pem"
+mm_certs_path: "{{ mm_docker_volumes_path }}/certs"
+mm_cert: "{{mm_certs_path}}/etc/letsencrypt/live/{{mm_domain}}/fullchain.pem"
+mm_cert_key: "{{mm_certs_path}}/etc/letsencrypt/live/{{mm_domain}}/privkey.pem"
 
 lets_encrypt_email: admin@example.com
 lets_encrypt_test_cert: true
@@ -37,8 +38,8 @@ mm_postgres_user: mmuser
 mm_postgres_pass: mmuser_password
 mm_postgres_db: mattermost
 
-mattermost_docker_uid: 2000
-mattermost_docker_gid: 2000
+mm_docker_uid: 2000
+mm_docker_gid: 2000
 
 mattermost_docker_upgrade: false
 mattermost_docker_install: false

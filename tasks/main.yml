@@ -5,7 +5,7 @@
 
 - name: Remove images and containers before rebuilding for upgrade
   docker_compose:
-    project_src: "{{ mattermost_docker_src_path }}"
+    project_src: "{{ mm_docker_src_path }}"
     state: absent
   when: mattermost_docker_upgrade
 

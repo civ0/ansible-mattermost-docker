@@ -3,7 +3,7 @@
 - name: Register backup timestamp
   command: date --iso=seconds
   register: backup_timestamp
-  changed_when: False
+  changed_when: false
 
 
 - name: Have containers running for database backup
@@ -13,7 +13,7 @@
 
 - name: Create backup directory
   file:
-    path: "{{ mattermost_docker_backup_path }}/{{ backup_timestamp.stdout }}"
+    path: "{{ mm_docker_backup_path }}/{{ backup_timestamp.stdout }}"
     state: directory
     recurse: true
   register: backup_dir
@@ -35,7 +35,7 @@
 
 - name: Backup volumes
   command: >
-    rsync -a {{ mattermost_docker_volumes_path }} {{ backup_dir.path }}
+    rsync -a {{ mm_docker_volumes_path }} {{ backup_dir.path }}
 
 - name: Start containers after volume backup
   systemd:

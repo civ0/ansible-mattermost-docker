@@ -79,8 +79,8 @@ Uprades are done rebuilding the images from a new version of [mattermost/docker]
 ## Variables
 The following variables are used by the role:
 ```
-mattermost_docker_install_path: /opt/mattermost
-mattermost_timezone: "UTC"
+mm_docker_install_path: /opt/mattermost
+mm_timezone: "UTC"
 mattermost_docker_upgrade: false
 mattermost_docker_install: false
 
