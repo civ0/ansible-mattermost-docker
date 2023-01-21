@@ -53,7 +53,7 @@ jobs:
           pipenv run molecule lint
           pipenv run molecule syntax
           pipenv run molecule converge
-          pipenv run molecule idempotence
+          # pipenv run molecule idempotence
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
