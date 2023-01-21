@@ -55,7 +55,7 @@
     state: directory
     owner: "{{ mattermost_docker_uid }}"
     group: "{{ mattermost_docker_gid }}"
-    recurse: yes
+    recurse: true
   with_items:
     - "{{ mattermost_config_path }}"
     - "{{ mattermost_data_path }}"
@@ -76,20 +76,20 @@
 
 - name: Reload daemons
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
   when: unit.changed
 
 - name: Enable service
   systemd:
     name: mattermost.service
-    enabled: yes
+    enabled: true
 
 - name: Build images
   docker_compose:
     project_src: "{{ mattermost_docker_src_path }}"
     files: ["docker-compose.yml", "docker-compose.nginx.yml"]
     state: present
-    stopped: yes
+    stopped: true
     build: "{{ mattermost_docker_upgrade }}"
 
 - name: Start containers
@@ -99,5 +99,7 @@
 
 - name: User information
   debug:
-    msg: You can now login to your Mattermost instance and do the initial setup. Run the restart-mattermost.yml playbook when you are done.
+    msg: >
+      You can now login to your Mattermost instance and do the initial setup.
+      Run the restart-mattermost.yml playbook when you are done.
   when: not mattermost_docker_upgrade

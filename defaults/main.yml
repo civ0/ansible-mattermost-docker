@@ -40,6 +40,6 @@ mm_postgres_db: mattermost
 mattermost_docker_uid: 2000
 mattermost_docker_gid: 2000
 
-mattermost_docker_upgrade: no
-mattermost_docker_install: no
-mattermost_emergency_restore: no
+mattermost_docker_upgrade: false
+mattermost_docker_install: false
+mattermost_emergency_restore: false
