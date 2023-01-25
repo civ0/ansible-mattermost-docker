@@ -7,7 +7,7 @@ driver:
 
 lint: |
   set -e
-  yamllint .
+  yamllint . --config-data '{ignore: .github/*}'
 
 platforms:
   - name: debian11-instance
