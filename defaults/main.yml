@@ -7,6 +7,7 @@ mattermost_domain: "example.com"
 ## https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 mattermost_timezone: "UTC"
 mm_version: v7.7
+mm_docker_version: "7dbb4b3"
 
 mattermost_docker_install_path: /opt/mattermost
 mattermost_docker_src_path: "{{ mattermost_docker_install_path }}/docker"

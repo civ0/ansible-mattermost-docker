@@ -9,7 +9,7 @@
   git:
     repo: https://github.com/mattermost/docker
     dest: "{{ mattermost_docker_src_path }}"
-    version: "HEAD"
+    version: "{{ mm_docker_version }}"
     force: "{{ mattermost_docker_upgrade }}"
     update: "{{ mattermost_docker_upgrade }}"
 
