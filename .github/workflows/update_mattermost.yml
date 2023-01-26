@@ -3,7 +3,7 @@
 name: test
 on:
   schedule:
-    - cron: '0 0 * * *'  # Run daily
+    - cron: '0 0 * * *'  # Run at midnight
 
 defaults:
   run:
@@ -25,43 +25,40 @@ jobs:
         with:
           path: 'mattermost'
 
-      - name: "Get latest mattermost version"
+      - name: "Get mattermost versions"
         run: |
-          export mm_latest=$(curl --silent $mattermost_release_api_url | jq -r .tag_name)
+          mm_latest=$(curl --silent $mattermost_release_api_url | jq -r .tag_name)
+          mm_latest=${mm_latest:1}  # release tags don't contain the 'v'
           echo "mm_latest=$mm_latest" >> $GITHUB_ENV
           echo "Latest mattermost: $mm_latest"
 
-      - name: "Get current mattermost version"
-        run: |
-          export mm_current=$(grep 'mm_version:' $defaults_yml | awk '{ print $2 }')
+          mm_current=$(grep 'mm_version:' $defaults_yml | awk '{ print $2 }')
           echo "Current mattermost: $mm_current"
           echo "mm_current=$mm_current" >> $GITHUB_ENV
-          echo "Latest mattermost: ${{ env.mm_latest }}"
+          echo "Latest mattermost: $mm_latest"
 
-      - name: "Check if we're on the latest version"
+      - name: "Update if new version available"
+        env:
+          new_branch: mattermost_${{ env.mm_latest }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "Current: ${{ env.mm_current }}"
+          echo "Latest:  ${{ env.mm_latest }}"
           if [ "${{ env.mm_current }}" = "${{ env.mm_latest }}" ]
           then
                 echo "No update available"
           else
                 echo "Update available"
+                git checkout -b ${{ env.new_branch }}
+                sed -i "s/mm_version: \"${{ env.mm_current }}\"/mm_version: \"${{ env.mm_latest }}\"/g" ${{ env.defaults_yml }}
+                git diff
+                git add ${{ env.defaults_yml }}
+                git config user.name  pr_bot
+                git config user.email pr_bot@noreply.github.com
+                git commit -m "Bump mattermost to ${{ env.mm_latest }}"
+                git push origin --set-upstream ${{ env.new_branch }} \
+                && gh pr create --base master \
+                      --title 'Update mattermost to ${{ env.mm_latest }}'\
+                      --body 'Version `${{ env.mm_latest }}` is available.'\
+                || true
           fi
-          echo "  current: ${{ env.mm_current }}"
-          echo "  latest:  ${{ env.mm_latest }}"
-
-      - name: "Bump mattermost version in ${{ env.defaults_yml }}"
-        env:
-          new_branch: mattermost_${{ env.mm_latest }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git checkout -b ${{ env.new_branch }}
-          sed -i "s/mm_version: ${{ env.mm_current }}/mm_version: ${{ env.mm_latest }}/g" ${{ env.defaults_yml }}
-          git diff
-          git add ${{ env.defaults_yml }}
-          git config user.name  pr_bot
-          git config user.email pr_bot@noreply.github.com
-          git commit -m "Bump mattermost to ${{ env.mm_latest }}"
-          git push origin --set-upstream ${{ env.new_branch }} || true
-          gh pr create --base master \
-                       --title 'Update mattermost to ${{ env.mm_latest }}'\
-                       --body 'Version `${{ env.mm_latest }}` is available.' || true

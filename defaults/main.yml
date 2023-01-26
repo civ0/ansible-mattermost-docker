@@ -7,7 +7,7 @@ mm_domain: "example.com"
 ## be looked up at Wikipedia:
 ## https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 mm_timezone: "UTC"
-mm_version: v7.7
+mm_version: "7.7"
 mm_docker_version: "7dbb4b3"
 
 mm_docker_install_path: /opt/mattermost
