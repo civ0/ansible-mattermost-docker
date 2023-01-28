@@ -6,6 +6,14 @@
 
   roles:
     - role: geerlingguy.docker
+
+    # install
     - role: mattermost
       vars:
-        mattermost_docker_install: true
+        mattermost_docker_install: yes
+
+    # upgrade
+    - role: mattermost
+      vars:
+        mattermost_docker_restart: yes
+        mattermost_docker_upgrade: yes
