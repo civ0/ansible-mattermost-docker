@@ -10,6 +10,7 @@ mm_timezone: "UTC"
 mm_version: "7.7.1"
 mm_docker_version: "7dbb4b3"
 
+
 mm_docker_install_path: /opt/mattermost
 mm_docker_src_path: "{{ mm_docker_install_path }}/docker"
 mm_docker_backup_path: "{{ mm_docker_install_path }}/backups"
